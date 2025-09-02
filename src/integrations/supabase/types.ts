@@ -14,7 +14,129 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      meditation_sessions: {
+        Row: {
+          ambient_sound: string | null
+          completed_at: string
+          created_at: string
+          duration_minutes: number
+          id: string
+          user_id: string
+        }
+        Insert: {
+          ambient_sound?: string | null
+          completed_at?: string
+          created_at?: string
+          duration_minutes: number
+          id?: string
+          user_id: string
+        }
+        Update: {
+          ambient_sound?: string | null
+          completed_at?: string
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mood_entries: {
+        Row: {
+          created_at: string
+          date: string
+          emotion_label: string | null
+          guided_prompt: string | null
+          id: string
+          journal_entry: string | null
+          mood_color: string
+          mood_intensity: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          emotion_label?: string | null
+          guided_prompt?: string | null
+          id?: string
+          journal_entry?: string | null
+          mood_color: string
+          mood_intensity: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          emotion_label?: string | null
+          guided_prompt?: string | null
+          id?: string
+          journal_entry?: string | null
+          mood_color?: string
+          mood_intensity?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_streaks: {
+        Row: {
+          created_at: string
+          id: string
+          journal_streak: number
+          last_journal_date: string | null
+          last_meditation_date: string | null
+          meditation_streak: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          journal_streak?: number
+          last_journal_date?: string | null
+          last_meditation_date?: string | null
+          meditation_streak?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          journal_streak?: number
+          last_journal_date?: string | null
+          last_meditation_date?: string | null
+          meditation_streak?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
