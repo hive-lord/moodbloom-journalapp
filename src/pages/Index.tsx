@@ -299,8 +299,8 @@ const IndexContent = () => {
               <Button 
                 variant="outline" 
                 onClick={() => setShowCalendar(!showCalendar)}
-                className="text-white border-white/30 bg-white/10 hover:bg-white/20 backdrop-blur-sm
-                          px-6 py-3 text-base font-medium shadow-soft"
+                className="text-white border-white/60 bg-white/25 hover:bg-white/40 backdrop-blur-sm
+                          px-6 py-3 text-base font-medium shadow-soft hover:shadow-glow transition-all"
               >
                 <Calendar className="h-5 w-5 mr-2" />
                 View Journey
@@ -308,8 +308,8 @@ const IndexContent = () => {
               <Button 
                 variant="outline"
                 onClick={() => setShowMeditation(!showMeditation)}
-                className="text-white border-white/30 bg-white/10 hover:bg-white/20 backdrop-blur-sm
-                          px-6 py-3 text-base font-medium shadow-soft"
+                className="text-white border-white/60 bg-white/25 hover:bg-white/40 backdrop-blur-sm
+                          px-6 py-3 text-base font-medium shadow-soft hover:shadow-glow transition-all"
               >
                 <Timer className="h-5 w-5 mr-2" />
                 Meditate
