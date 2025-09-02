@@ -324,24 +324,40 @@ const IndexContent = () => {
   };
 
   const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-    const dateStr = format(date, 'yyyy-MM-dd');
-    const entry = moodEntries.find(e => e.date === dateStr);
+    const selectedDate = format(date, 'yyyy-MM-dd');
+    const entryForDate = moodEntries.find(entry => entry.date === selectedDate);
     
-    if (entry) {
+    setSelectedDate(date);
+    
+    if (entryForDate) {
+      // Load the entry for the selected date
       setCurrentMood({
-        color: entry.mood_color,
-        intensity: entry.mood_intensity,
-        emotion: entry.emotion_label,
-        colorName: entry.mood_color
+        color: entryForDate.mood_color,
+        intensity: entryForDate.mood_intensity,
+        emotion: entryForDate.emotion_label,
+        colorName: entryForDate.mood_color
       });
-      setJournalEntry(entry.journal_entry || '');
-      setSelectedPrompt(entry.guided_prompt || '');
+      setJournalEntry(entryForDate.journal_entry || '');
+      setSelectedPrompt(entryForDate.guided_prompt || '');
+      
+      toast({
+        title: `Entry from ${format(date, 'MMM dd, yyyy')}`,
+        description: `Mood: ${entryForDate.emotion_label || entryForDate.mood_color} • Intensity: ${entryForDate.mood_intensity}/10`,
+      });
     } else {
+      // No entry for this date, clear current selections
       setCurrentMood(null);
       setJournalEntry('');
       setSelectedPrompt('');
+      
+      toast({
+        title: `No entry for ${format(date, 'MMM dd, yyyy')}`,
+        description: "Select your mood to create a new entry for this date.",
+        variant: "default"
+      });
     }
+    
+    setShowCalendar(false);
   };
 
   if (loading) {
@@ -474,7 +490,7 @@ const IndexContent = () => {
             <div className="animate-fade-in">
               <EmotionalCalendar 
                 moodEntries={moodEntries}
-                onDateSelect={handleDateSelect}
+              onDateSelect={handleDateSelect}
                 selectedDate={selectedDate}
               />
             </div>
@@ -506,8 +522,9 @@ const IndexContent = () => {
                   <Textarea
                     value={journalEntry}
                     onChange={(e) => setJournalEntry(e.target.value)}
-                    placeholder="Write freely about your day, thoughts, or feelings..."
+                    placeholder={currentMood ? "Write freely about your day, thoughts, or feelings..." : "Please select your mood first to start journaling..."}
                     className="min-h-32 resize-none"
+                    disabled={!currentMood}
                   />
                   
                   <div className="flex justify-between items-center">
@@ -520,7 +537,7 @@ const IndexContent = () => {
                       disabled={isSaving || !currentMood}
                       className="shadow-soft hover:shadow-glow"
                     >
-                      {isSaving ? 'Saving...' : (
+                      {isSaving ? 'Saving...' : !currentMood ? 'Select mood first' : (
                         <>
                           <Sparkles className="h-4 w-4 mr-2" />
                           Save Entry
