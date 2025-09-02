@@ -1,42 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Calm Mood Journal Design System - All colors MUST be HSL */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Calming color palette inspired by nature and wellness */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Ocean blues for trust and calm */
+    --primary: 207 89% 54%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 207 89% 70%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Growth greens for progress */
+    --secondary: 142 69% 58%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-glow: 142 69% 75%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Warm sunset accents for positivity */
+    --accent: 25 95% 65%;
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 25 95% 80%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 20% 95%;
+    --muted-foreground: 215 16% 47%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 210 20% 90%;
+    --input: 210 20% 90%;
+    --ring: 207 89% 54%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
+
+    /* Mood colors for emotional tracking */
+    --mood-joy: 45 100% 70%;
+    --mood-calm: 195 100% 75%;
+    --mood-energy: 120 100% 70%;
+    --mood-love: 330 100% 75%;
+    --mood-sadness: 220 50% 60%;
+    --mood-anger: 0 100% 65%;
+    --mood-anxiety: 280 50% 65%;
+    --mood-neutral: 0 0% 70%;
+
+    /* Meditation and wellness gradients */
+    --gradient-calm: linear-gradient(135deg, hsl(207, 89%, 54%), hsl(142, 69%, 58%));
+    --gradient-sunset: linear-gradient(135deg, hsl(25, 95%, 65%), hsl(45, 100%, 70%));
+    --gradient-ocean: linear-gradient(180deg, hsl(207, 89%, 70%), hsl(207, 89%, 54%));
+    --gradient-forest: linear-gradient(180deg, hsl(142, 69%, 75%), hsl(142, 69%, 58%));
+
+    /* Gentle shadows for depth */
+    --shadow-soft: 0 4px 20px -8px hsl(207, 89%, 54% / 0.2);
+    --shadow-glow: 0 0 30px hsl(207, 89%, 54% / 0.3);
+    --shadow-card: 0 8px 40px -12px hsl(215, 25%, 15% / 0.1);
+
+    /* Animation timing for calm interactions */
+    --transition-calm: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-gentle: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +132,50 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
+}
+
+@layer components {
+  /* Breathing animation for meditation */
+  .breathe {
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  /* Gentle hover effects */
+  .hover-lift {
+    transition: var(--transition-gentle);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+  }
+
+  /* Mood color utilities */
+  .mood-joy { background: hsl(var(--mood-joy)); }
+  .mood-calm { background: hsl(var(--mood-calm)); }
+  .mood-energy { background: hsl(var(--mood-energy)); }
+  .mood-love { background: hsl(var(--mood-love)); }
+  .mood-sadness { background: hsl(var(--mood-sadness)); }
+  .mood-anger { background: hsl(var(--mood-anger)); }
+  .mood-anxiety { background: hsl(var(--mood-anxiety)); }
+  .mood-neutral { background: hsl(var(--mood-neutral)); }
+
+  /* Gradient backgrounds */
+  .bg-gradient-calm { background: var(--gradient-calm); }
+  .bg-gradient-sunset { background: var(--gradient-sunset); }
+  .bg-gradient-ocean { background: var(--gradient-ocean); }
+  .bg-gradient-forest { background: var(--gradient-forest); }
+
+  /* Custom shadow utilities */
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-card { box-shadow: var(--shadow-card); }
 }
