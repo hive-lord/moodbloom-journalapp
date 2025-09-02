@@ -14,7 +14,7 @@ import { PaymentModal } from '@/components/PaymentModal';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Calendar, LogOut, User, BookOpen, Timer, Sparkles, Crown } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import heroImage from '@/assets/hero-calm.jpg';
 
 interface MoodEntry {
@@ -83,6 +83,53 @@ const IndexContent = () => {
     }
   };
 
+  const updateJournalStreak = async () => {
+    if (!user) return;
+
+    try {
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+
+      // Get current streak data
+      const { data: currentStreak } = await supabase
+        .from('user_streaks')
+        .select('journal_streak, last_journal_date')
+        .eq('user_id', user.id)
+        .single();
+
+      let newStreak = 1;
+      const lastJournalDate = currentStreak?.last_journal_date;
+
+      if (lastJournalDate) {
+        if (lastJournalDate === yesterday) {
+          // Continue streak
+          newStreak = (currentStreak?.journal_streak || 0) + 1;
+        } else if (lastJournalDate === today) {
+          // Already journaled today, no streak change
+          newStreak = currentStreak?.journal_streak || 1;
+        } else {
+          // Streak broken, start new
+          newStreak = 1;
+        }
+      }
+
+      // Update streak in database
+      await supabase
+        .from('user_streaks')
+        .upsert({
+          user_id: user.id,
+          journal_streak: newStreak,
+          last_journal_date: today,
+          updated_at: new Date().toISOString()
+        });
+
+      console.log('Journal streak updated:', { newStreak, lastJournalDate, today });
+
+    } catch (error) {
+      console.error('Error updating journal streak:', error);
+    }
+  };
+
   const loadUserData = async () => {
     if (!user) return;
 
@@ -120,6 +167,53 @@ const IndexContent = () => {
       }
     } catch (error) {
       console.error('Error loading user data:', error);
+    }
+  };
+
+  const updateMeditationStreak = async () => {
+    if (!user) return;
+
+    try {
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+
+      // Get current streak data
+      const { data: currentStreak } = await supabase
+        .from('user_streaks')
+        .select('meditation_streak, last_meditation_date')
+        .eq('user_id', user.id)
+        .single();
+
+      let newStreak = 1;
+      const lastMeditationDate = currentStreak?.last_meditation_date;
+
+      if (lastMeditationDate) {
+        if (lastMeditationDate === yesterday) {
+          // Continue streak
+          newStreak = (currentStreak?.meditation_streak || 0) + 1;
+        } else if (lastMeditationDate === today) {
+          // Already meditated today, no streak change
+          newStreak = currentStreak?.meditation_streak || 1;
+        } else {
+          // Streak broken, start new
+          newStreak = 1;
+        }
+      }
+
+      // Update streak in database
+      await supabase
+        .from('user_streaks')
+        .upsert({
+          user_id: user.id,
+          meditation_streak: newStreak,
+          last_meditation_date: today,
+          updated_at: new Date().toISOString()
+        });
+
+      console.log('Meditation streak updated:', { newStreak, lastMeditationDate, today });
+
+    } catch (error) {
+      console.error('Error updating meditation streak:', error);
     }
   };
 
@@ -173,6 +267,9 @@ const IndexContent = () => {
           user_id: user.id 
         });
 
+      // Update journal streak
+      await updateJournalStreak();
+      
       // Reload data
       loadUserData();
 
@@ -211,6 +308,10 @@ const IndexContent = () => {
           ambient_sound: ambientSound
         });
 
+      // Update meditation streak
+      await updateMeditationStreak();
+
+      // Reload data
       loadUserData();
 
       toast({
