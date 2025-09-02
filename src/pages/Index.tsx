@@ -259,21 +259,21 @@ const IndexContent = () => {
               
               {/* Entry counter and upgrade */}
               <div className="flex items-center gap-3">
-                <div className="bg-white/15 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/30">
-                  <div className="flex items-center gap-3 text-white">
-                    <div className="flex items-center gap-2">
-                      <BookOpen className="h-4 w-4" />
-                      <span className="text-sm">
-                        {moodEntries.length} / {entryLimit} entries
-                      </span>
-                    </div>
-                    {moodEntries.length >= entryLimit * 0.7 && (
-                      <div className="border-l border-white/30 pl-3">
-                        <PaymentModal />
+                <PaymentModal 
+                  trigger={
+                    <div className="bg-white/15 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/30 hover:bg-white/20 transition-colors cursor-pointer">
+                      <div className="flex items-center gap-2 text-white">
+                        <BookOpen className="h-4 w-4" />
+                        <span className="text-sm">
+                          {moodEntries.length} / {entryLimit} entries
+                        </span>
+                        {moodEntries.length >= entryLimit * 0.7 && (
+                          <Crown className="h-3 w-3 ml-1 opacity-80" />
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
+                    </div>
+                  }
+                />
               </div>
             </div>
             

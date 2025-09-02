@@ -6,7 +6,11 @@ import { CreditCard, Crown, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export const PaymentModal: React.FC = () => {
+interface PaymentModalProps {
+  trigger?: React.ReactNode;
+}
+
+export const PaymentModal: React.FC<PaymentModalProps> = ({ trigger }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -42,14 +46,16 @@ export const PaymentModal: React.FC = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button 
-          variant="ghost"
-          size="sm"
-          className="text-white hover:bg-white/20 flex items-center gap-2"
-        >
-          <Crown className="h-4 w-4" />
-          Upgrade
-        </Button>
+        {trigger || (
+          <Button 
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-white/20 flex items-center gap-2"
+          >
+            <Crown className="h-4 w-4" />
+            Upgrade
+          </Button>
+        )}
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-md">
