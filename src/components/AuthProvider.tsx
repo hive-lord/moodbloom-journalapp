@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       } else {
         toast({
-          title: "Welcome to Calm Journal",
+          title: "Welcome to MoodBloom",
           description: "Check your email to confirm your account"
         });
       }
