@@ -9,6 +9,7 @@ import { MeditationTimer } from '@/components/MeditationTimer';
 import { EmotionalCalendar } from '@/components/EmotionalCalendar';
 import { StreakCounter } from '@/components/StreakCounter';
 import { AuthProvider, useAuth } from '@/components/AuthProvider';
+import { WelcomeUpgradeModal } from '@/components/WelcomeUpgradeModal';
 import { PaymentModal } from '@/components/PaymentModal';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -50,6 +51,7 @@ const IndexContent = () => {
   const [showMeditation, setShowMeditation] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasPremium, setHasPremium] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const entryLimit = hasPremium ? Infinity : 20; // Unlimited for premium, 20 for free
 
   // Load user data when authenticated
@@ -57,6 +59,8 @@ const IndexContent = () => {
     if (user) {
       loadUserData();
       checkPremiumStatus();
+      // Show welcome modal on every login
+      setShowWelcomeModal(true);
     }
   }, [user]);
 
@@ -451,6 +455,15 @@ const IndexContent = () => {
 
         </div>
       </div>
+      
+      {/* Welcome/Upgrade Modal */}
+      <WelcomeUpgradeModal
+        isOpen={showWelcomeModal}
+        onClose={() => setShowWelcomeModal(false)}
+        hasPremium={hasPremium}
+        currentEntries={moodEntries.length}
+        entryLimit={entryLimit}
+      />
     </div>
   );
 };
