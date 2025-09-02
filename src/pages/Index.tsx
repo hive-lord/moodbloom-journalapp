@@ -260,7 +260,7 @@ const IndexContent = () => {
           alt="Calm meditation background" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-background" />
         
         {/* Header */}
         <div className="absolute top-0 left-0 right-0 p-6">
