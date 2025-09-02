@@ -15,11 +15,8 @@ const PaymentSuccess = () => {
     if (sessionId) {
       setIsVerified(true);
       
-      // Update local storage to add 10 more entries for guest users
-      const guestData = JSON.parse(localStorage.getItem('calmJournal_guestData') || '{}');
-      const currentLimit = guestData.paidEntries || 0;
-      guestData.paidEntries = currentLimit + 10;
-      localStorage.setItem('calmJournal_guestData', JSON.stringify(guestData));
+      // Note: This was for guest mode which has been removed
+      // Payment success is now handled via proper user authentication
     }
   }, [sessionId]);
 

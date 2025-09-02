@@ -40,7 +40,7 @@ const Auth = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/60" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white space-y-2">
-            <h1 className="text-4xl font-light">Calm Journal</h1>
+            <h1 className="text-4xl font-light">MoodBloom</h1>
             <p className="text-lg opacity-90">Your space for mindful reflection</p>
           </div>
         </div>
@@ -157,15 +157,6 @@ const Auth = () => {
               </div>
             </TabsContent>
           </Tabs>
-
-          <div className="mt-6 text-center">
-            <Button variant="ghost" size="sm" asChild>
-              <a href="/">Continue as Guest</a>
-            </Button>
-            <p className="text-xs text-muted-foreground mt-2">
-              Guest mode uses local storage only
-            </p>
-          </div>
         </Card>
       </div>
     </div>

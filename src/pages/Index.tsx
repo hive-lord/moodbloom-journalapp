@@ -54,9 +54,6 @@ const IndexContent = () => {
   useEffect(() => {
     if (user) {
       loadUserData();
-    } else {
-      // Guest mode - load from localStorage
-      loadGuestData();
     }
   }, [user]);
 
@@ -100,30 +97,17 @@ const IndexContent = () => {
     }
   };
 
-  const loadGuestData = () => {
-    const guestData = localStorage.getItem('calmJournal_guestData');
-    if (guestData) {
-      const data = JSON.parse(guestData);
-      setMoodEntries(data.entries || []);
-      setUserStreaks(data.streaks || { journal_streak: 0, meditation_streak: 0 });
-      
-      // Check today's entry
-      const today = format(new Date(), 'yyyy-MM-dd');
-      const todayEntry = data.entries?.find((entry: MoodEntry) => entry.date === today);
-      if (todayEntry) {
-        setCurrentMood({
-          color: todayEntry.mood_color,
-          intensity: todayEntry.mood_intensity,
-          emotion: todayEntry.emotion_label,
-          colorName: todayEntry.mood_color
-        });
-        setJournalEntry(todayEntry.journal_entry || '');
-        setSelectedPrompt(todayEntry.guided_prompt || '');
-      }
-    }
-  };
 
   const saveEntry = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save your entries",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!currentMood) {
       toast({
         title: "Pick a mood first",
@@ -131,23 +115,6 @@ const IndexContent = () => {
         variant: "destructive"
       });
       return;
-    }
-
-    // Check entry limit for guest users
-    if (!user) {
-      const guestData = JSON.parse(localStorage.getItem('calmJournal_guestData') || '{}');
-      const baseLimit = 10;
-      const paidEntries = guestData.paidEntries || 0;
-      const maxAllowed = baseLimit + paidEntries;
-      
-      if (moodEntries.length >= maxAllowed) {
-        toast({
-          title: "Entry limit reached",
-          description: "Purchase more entries to continue journaling",
-          variant: "destructive"
-        });
-        return;
-      }
     }
 
     setIsSaving(true);
@@ -163,33 +130,16 @@ const IndexContent = () => {
     };
 
     try {
-      if (user) {
-        // Save to Supabase
-        await supabase
-          .from('mood_entries')
-          .upsert({ 
-            ...entryData, 
-            user_id: user.id 
-          });
+      // Save to Supabase
+      await supabase
+        .from('mood_entries')
+        .upsert({ 
+          ...entryData, 
+          user_id: user.id 
+        });
 
-        // For now, manually increment streak in guest mode logic
-        // TODO: Add proper streak calculation with RPC functions
-        
-        // Reload data
-        loadUserData();
-      } else {
-        // Save to localStorage (guest mode)
-        const guestData = JSON.parse(localStorage.getItem('calmJournal_guestData') || '{}');
-        const existingEntries = guestData.entries || [];
-        const filteredEntries = existingEntries.filter((entry: MoodEntry) => entry.date !== today);
-        
-        guestData.entries = [...filteredEntries, entryData];
-        guestData.streaks = { ...userStreaks, journal_streak: userStreaks.journal_streak + 1 };
-        
-        localStorage.setItem('calmJournal_guestData', JSON.stringify(guestData));
-        setMoodEntries(guestData.entries);
-        setUserStreaks(guestData.streaks);
-      }
+      // Reload data
+      loadUserData();
 
       toast({
         title: "Entry saved",
@@ -208,25 +158,25 @@ const IndexContent = () => {
   };
 
   const handleMeditationComplete = async (duration: number, ambientSound?: string) => {
-    try {
-      if (user) {
-        await supabase
-          .from('meditation_sessions')
-          .insert({
-            user_id: user.id,
-            duration_minutes: duration,
-            ambient_sound: ambientSound
-          });
+    if (!user) {
+      toast({
+        title: "Authentication required", 
+        description: "Please sign in to track meditation sessions",
+        variant: "destructive"
+      });
+      return;
+    }
 
-        // TODO: Add proper streak calculation with RPC functions
-        loadUserData();
-      } else {
-        // Guest mode
-        const guestData = JSON.parse(localStorage.getItem('calmJournal_guestData') || '{}');
-        guestData.streaks = { ...userStreaks, meditation_streak: userStreaks.meditation_streak + 1 };
-        localStorage.setItem('calmJournal_guestData', JSON.stringify(guestData));
-        setUserStreaks(guestData.streaks);
-      }
+    try {
+      await supabase
+        .from('meditation_sessions')
+        .insert({
+          user_id: user.id,
+          duration_minutes: duration,
+          ambient_sound: ambientSound
+        });
+
+      loadUserData();
 
       toast({
         title: "Meditation complete",
@@ -269,6 +219,20 @@ const IndexContent = () => {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl font-light text-foreground">MoodBloom</h1>
+          <p className="text-muted-foreground">Please sign in to continue your wellness journey</p>
+          <Button asChild>
+            <Link to="/auth">Sign In</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -284,36 +248,22 @@ const IndexContent = () => {
         <div className="absolute top-0 left-0 right-0 p-6">
           <div className="flex justify-between items-center">
             <div className="text-white">
-              <h1 className="text-3xl font-light">Calm Journal</h1>
+              <h1 className="text-3xl font-light">MoodBloom</h1>
               <p className="text-white/80">
-                {user ? `Welcome back${user.user_metadata?.display_name ? `, ${user.user_metadata.display_name}` : ''}` : 'Welcome, guest'}
+                Welcome back{user.user_metadata?.display_name ? `, ${user.user_metadata.display_name}` : ''}
               </p>
             </div>
             
             <div className="flex items-center gap-3">
-              {user ? (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={signOut}
-                  className="text-white hover:bg-white/10"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              ) : (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  asChild
-                  className="text-white hover:bg-white/10"
-                >
-                  <Link to="/auth">
-                    <User className="h-4 w-4 mr-2" />
-                    Sign In
-                  </Link>
-                </Button>
-              )}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={signOut}
+                className="text-white hover:bg-white/10"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </div>
@@ -398,47 +348,22 @@ const IndexContent = () => {
                   />
                   
                   <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <div className="text-xs text-muted-foreground">
-                        {journalEntry.length} characters
-                      </div>
-                      {!user && (() => {
-                        const guestData = JSON.parse(localStorage.getItem('calmJournal_guestData') || '{}');
-                        const baseLimit = 10;
-                        const paidEntries = guestData.paidEntries || 0;
-                        const maxAllowed = baseLimit + paidEntries;
-                        return (
-                          <PaymentModal 
-                            currentEntryCount={moodEntries.length} 
-                            maxEntries={maxAllowed} 
-                          />
-                        );
-                      })()}
+                    <div className="text-xs text-muted-foreground">
+                      {journalEntry.length} characters
                     </div>
                     
-                    <div className="flex gap-2">
-                      {!user && (
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to="/auth">
-                            <User className="h-3 w-3 mr-1" />
-                            Save Progress
-                          </Link>
-                        </Button>
+                    <Button 
+                      onClick={saveEntry}
+                      disabled={isSaving || !currentMood}
+                      className="shadow-soft hover:shadow-glow"
+                    >
+                      {isSaving ? 'Saving...' : (
+                        <>
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Save Entry
+                        </>
                       )}
-                      
-                      <Button 
-                        onClick={saveEntry}
-                        disabled={isSaving || !currentMood}
-                        className="shadow-soft hover:shadow-glow"
-                      >
-                        {isSaving ? 'Saving...' : (
-                          <>
-                            <Sparkles className="h-4 w-4 mr-2" />
-                            Save Entry
-                          </>
-                        )}
-                      </Button>
-                    </div>
+                    </Button>
                   </div>
                 </div>
               </Card>
@@ -466,17 +391,6 @@ const IndexContent = () => {
             </div>
           </div>
 
-          {/* Guest Mode Notice */}
-          {!user && (
-            <Card className="p-4 bg-accent/10 border-accent/20">
-              <div className="text-center space-y-2">
-                <p className="text-sm font-medium text-accent">Guest Mode</p>
-                <p className="text-xs text-muted-foreground">
-                  Your entries are saved locally. <Link to="/auth" className="text-primary hover:underline">Create an account</Link> to sync across devices and never lose your progress.
-                </p>
-              </div>
-            </Card>
-          )}
         </div>
       </div>
     </div>

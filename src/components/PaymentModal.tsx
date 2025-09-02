@@ -6,15 +6,7 @@ import { CreditCard, Plus, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface PaymentModalProps {
-  currentEntryCount: number;
-  maxEntries: number;
-}
-
-export const PaymentModal: React.FC<PaymentModalProps> = ({ 
-  currentEntryCount, 
-  maxEntries 
-}) => {
+export const PaymentModal: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -47,20 +39,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
     }
   };
 
-  const remainingEntries = maxEntries - currentEntryCount;
-  const isNearLimit = remainingEntries <= 2;
-  const isAtLimit = remainingEntries <= 0;
-
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button 
-          variant={isNearLimit ? "default" : "outline"}
+          variant="outline"
           size="sm"
-          className={isNearLimit ? "animate-gentle-pulse" : ""}
+          className="animate-gentle-pulse"
         >
           <Plus className="h-4 w-4 mr-2" />
-          {isAtLimit ? "Get More Entries" : `${remainingEntries} entries left`}
+          Get More Entries
         </Button>
       </DialogTrigger>
       
@@ -73,9 +61,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <Card className="p-6 bg-gradient-calm text-white text-center">
             <div className="space-y-2">
               <Sparkles className="h-8 w-8 mx-auto opacity-90" />
-              <h3 className="text-lg font-medium">Continue Your Journey</h3>
+              <h3 className="text-lg font-medium">Unlock More Entries</h3>
               <p className="text-sm opacity-90">
-                You've used {currentEntryCount} of {maxEntries} free entries
+                Get 10 additional journal entries for your wellness journey
               </p>
             </div>
           </Card>
