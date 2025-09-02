@@ -484,11 +484,7 @@ const IndexContent = () => {
 };
 
 const Index = () => {
-  return (
-    <AuthProvider>
-      <IndexContent />
-    </AuthProvider>
-  );
+  return <IndexContent />;
 };
 
 export default Index;
