@@ -6,10 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/components/AuthProvider';
+import { toast } from '@/components/ui/use-toast';
 import heroImage from '@/assets/hero-calm.jpg';
 
 const Auth = () => {
-  const { user, signIn, signUp, loading } = useAuth();
+  const { user, signIn, signUp, resendConfirmation, loading } = useAuth();
   const [signInData, setSignInData] = useState({ email: '', password: '' });
   const [signUpData, setSignUpData] = useState({ email: '', password: '', displayName: '' });
 
@@ -95,6 +96,28 @@ const Auth = () => {
                 >
                   {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
+
+                <div className="text-center">
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    className="px-0"
+                    onClick={async () => {
+                      if (!signInData.email) {
+                        toast({
+                          title: 'Enter your email',
+                          description: 'We need it to resend your confirmation link.',
+                          variant: 'destructive',
+                        });
+                        return;
+                      }
+                      await resendConfirmation(signInData.email);
+                    }}
+                  >
+                    Resend confirmation email
+                  </Button>
+                </div>
               </form>
             </TabsContent>
 
