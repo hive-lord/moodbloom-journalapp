@@ -97,6 +97,7 @@ export const MoodColorPicker: React.FC<MoodColorPickerProps> = ({
             onClick={() => handleColorSelect(moodColor)}
             className={`
               aspect-square rounded-2xl border-2 transition-all duration-300 hover-lift
+              flex items-center justify-center relative overflow-hidden
               ${selectedColor === moodColor.name 
                 ? 'border-primary scale-105 shadow-glow' 
                 : 'border-border hover:border-primary/50'
@@ -105,7 +106,10 @@ export const MoodColorPicker: React.FC<MoodColorPickerProps> = ({
             style={{ backgroundColor: moodColor.color }}
             aria-label={`Select ${moodColor.name} mood`}
           >
-            <span className="sr-only">{moodColor.name}</span>
+            {/* Color label */}
+            <span className="text-xs font-medium text-white drop-shadow-lg text-center px-1 leading-tight">
+              {moodColor.name}
+            </span>
           </button>
         ))}
       </div>
