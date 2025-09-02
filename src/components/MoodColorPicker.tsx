@@ -147,21 +147,52 @@ export const MoodColorPicker: React.FC<MoodColorPickerProps> = ({
             What word describes this feeling?
           </h4>
           <div className="flex flex-wrap gap-2 justify-center">
-            {selectedColorData.emotions.map((emotion) => (
-              <button
-                key={emotion}
-                onClick={() => handleEmotionSelect(emotion)}
-                className={`
-                  px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200
-                  ${selectedEmotion === emotion
-                    ? 'bg-primary text-primary-foreground shadow-soft'
-                    : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-                  }
-                `}
-              >
-                {emotion}
-              </button>
-            ))}
+            {selectedColorData.emotions.map((emotion, index) => {
+              // Modify emotion word based on intensity
+              let displayEmotion = emotion;
+              
+              if (intensity <= 3) {
+                // Low intensity - softer words
+                const lowIntensityMap: Record<string, string> = {
+                  'Happy': 'Content', 'Excited': 'Interested', 'Grateful': 'Thankful', 'Energetic': 'Alert',
+                  'Peaceful': 'Quiet', 'Relaxed': 'At ease', 'Centered': 'Balanced', 'Serene': 'Calm',
+                  'Motivated': 'Focused', 'Confident': 'Sure', 'Strong': 'Steady', 'Focused': 'Attentive',
+                  'Loving': 'Caring', 'Connected': 'Close', 'Warm': 'Gentle', 'Appreciated': 'Valued',
+                  'Sad': 'Down', 'Lonely': 'Alone', 'Disappointed': 'Let down', 'Melancholy': 'Blue',
+                  'Frustrated': 'Annoyed', 'Irritated': 'Bothered', 'Angry': 'Upset', 'Upset': 'Troubled',
+                  'Worried': 'Concerned', 'Nervous': 'Uneasy', 'Stressed': 'Tense', 'Overwhelmed': 'Pressured'
+                };
+                displayEmotion = lowIntensityMap[emotion] || emotion;
+              } else if (intensity >= 8) {
+                // High intensity - stronger words
+                const highIntensityMap: Record<string, string> = {
+                  'Happy': 'Ecstatic', 'Excited': 'Thrilled', 'Grateful': 'Blessed', 'Energetic': 'Electric',
+                  'Peaceful': 'Blissful', 'Relaxed': 'Tranquil', 'Centered': 'Grounded', 'Serene': 'Zen',
+                  'Motivated': 'Driven', 'Confident': 'Powerful', 'Strong': 'Unstoppable', 'Focused': 'Laser-focused',
+                  'Loving': 'Adoring', 'Connected': 'United', 'Warm': 'Glowing', 'Appreciated': 'Cherished',
+                  'Sad': 'Heartbroken', 'Lonely': 'Isolated', 'Disappointed': 'Crushed', 'Melancholy': 'Despair',
+                  'Frustrated': 'Furious', 'Irritated': 'Livid', 'Angry': 'Enraged', 'Upset': 'Devastated',
+                  'Worried': 'Panicked', 'Nervous': 'Terrified', 'Stressed': 'Overwhelmed', 'Overwhelmed': 'Crushed'
+                };
+                displayEmotion = highIntensityMap[emotion] || emotion;
+              }
+              
+              return (
+                <button
+                  key={emotion}
+                  onClick={() => handleEmotionSelect(displayEmotion)}
+                  className={`
+                    px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200
+                    ${selectedEmotion === displayEmotion
+                      ? 'bg-primary text-primary-foreground shadow-soft'
+                      : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground'
+                    }
+                  `}
+                >
+                  {displayEmotion}
+                </button>
+              );
+            })}
           </div>
           
           {selectedEmotion && (

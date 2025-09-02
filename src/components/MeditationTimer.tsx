@@ -62,11 +62,11 @@ const generateNatureSound = (audioContext: AudioContext, type: 'rain' | 'waves' 
 };
 
 const AMBIENT_SOUNDS = [
-  { id: 'none', name: 'Silence', emoji: '🔇' },
-  { id: 'rain', name: 'Rain', emoji: '🌧️' },
-  { id: 'waves', name: 'Ocean Waves', emoji: '🌊' },
-  { id: 'forest', name: 'Forest', emoji: '🌲' },
-  { id: 'brown-noise', name: 'Brown Noise', emoji: '🎵' }
+  { id: 'none', name: 'Silence', emoji: '🔇', description: 'Pure silence' },
+  { id: 'rain', name: 'Rain', emoji: '🌧️', description: 'Heavy rain drops' },
+  { id: 'waves', name: 'Ocean', emoji: '🌊', description: 'Ocean waves' },
+  { id: 'forest', name: 'Forest', emoji: '🌲', description: 'Insects & birds' },
+  { id: 'brown-noise', name: 'Brown Noise', emoji: '🎵', description: 'Deep calm sound' }
 ];
 
 const PRESET_DURATIONS = [
@@ -322,7 +322,10 @@ export const MeditationTimer: React.FC<MeditationTimerProps> = ({
                 <SelectItem key={sound.id} value={sound.id}>
                   <span className="flex items-center gap-2">
                     <span>{sound.emoji}</span>
-                    <span>{sound.name}</span>
+                    <div className="flex flex-col items-start">
+                      <span>{sound.name}</span>
+                      <span className="text-xs text-muted-foreground">{sound.description}</span>
+                    </div>
                   </span>
                 </SelectItem>
               ))}

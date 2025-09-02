@@ -9,6 +9,7 @@ import { MeditationTimer } from '@/components/MeditationTimer';
 import { EmotionalCalendar } from '@/components/EmotionalCalendar';
 import { StreakCounter } from '@/components/StreakCounter';
 import { AuthProvider, useAuth } from '@/components/AuthProvider';
+import { PaymentModal } from '@/components/PaymentModal';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Calendar, LogOut, User, BookOpen, Timer, Sparkles } from 'lucide-react';
@@ -308,17 +309,19 @@ const IndexContent = () => {
               <Button 
                 variant="outline" 
                 onClick={() => setShowCalendar(!showCalendar)}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                className="text-white border-white/30 bg-white/10 hover:bg-white/20 backdrop-blur-sm
+                          px-6 py-3 text-base font-medium shadow-soft"
               >
-                <Calendar className="h-4 w-4 mr-2" />
+                <Calendar className="h-5 w-5 mr-2" />
                 View Journey
               </Button>
               <Button 
                 variant="outline"
                 onClick={() => setShowMeditation(!showMeditation)}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                className="text-white border-white/30 bg-white/10 hover:bg-white/20 backdrop-blur-sm
+                          px-6 py-3 text-base font-medium shadow-soft"
               >
-                <Timer className="h-4 w-4 mr-2" />
+                <Timer className="h-5 w-5 mr-2" />
                 Meditate
               </Button>
             </div>
@@ -378,8 +381,14 @@ const IndexContent = () => {
                   />
                   
                   <div className="flex justify-between items-center">
-                    <div className="text-xs text-muted-foreground">
-                      {journalEntry.length} characters
+                    <div className="flex items-center gap-2">
+                      <div className="text-xs text-muted-foreground">
+                        {journalEntry.length} characters
+                      </div>
+                      <PaymentModal 
+                        currentEntryCount={moodEntries.length} 
+                        maxEntries={user ? 50 : 5} 
+                      />
                     </div>
                     
                     <div className="flex gap-2">

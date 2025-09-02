@@ -9,10 +9,10 @@
 @layer base {
   :root {
     /* Calming color palette inspired by nature and wellness */
-    --background: 210 20% 98%;
+    --background: 208 30% 96%;
     --foreground: 215 25% 15%;
 
-    --card: 0 0% 100%;
+    --card: 210 25% 99%;
     --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
