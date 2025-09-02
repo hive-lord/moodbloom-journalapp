@@ -32,21 +32,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state change:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        if (event === 'SIGNED_OUT') {
+          // Clear any cached data on sign out
+          localStorage.removeItem('supabase.auth.token');
+        }
+        
+        if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed successfully');
+        }
       }
     );
 
-    // Then check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Then check for existing session with error handling
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) {
+          console.error('Error getting session:', error);
+          toast({
+            title: "Connection Issue",
+            description: "Having trouble connecting. Please check your internet connection.",
+            variant: "destructive"
+          });
+        }
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Failed to get session:', error);
+        setLoading(false);
+      });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [toast]);
 
   const signUp = async (email: string, password: string, displayName?: string) => {
     try {
@@ -99,11 +122,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast({
-          title: "Sign in failed",
-          description: error.message,
-          variant: "destructive"
-        });
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          toast({
+            title: "Connection Error",
+            description: "Unable to connect. Please check your internet connection and try again.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Sign in failed",
+            description: error.message,
+            variant: "destructive"
+          });
+        }
       } else {
         toast({
           title: "Welcome back",
@@ -113,9 +144,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return { error };
     } catch (error: any) {
+      console.error('Sign in error:', error);
+      const isNetworkError = error.message?.includes('fetch') || error.message?.includes('network') || !navigator.onLine;
       toast({
-        title: "Something went wrong",
-        description: error.message,
+        title: isNetworkError ? "Connection Error" : "Something went wrong",
+        description: isNetworkError ? "Please check your internet connection and try again." : error.message,
         variant: "destructive"
       });
       return { error };
