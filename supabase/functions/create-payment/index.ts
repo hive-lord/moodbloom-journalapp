@@ -13,15 +13,16 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    // Create Supabase client using the anon key for user authentication
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
+  // Create Supabase client using service role key for database writes
+  const supabaseService = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    { auth: { persistSession: false } }
+  );
 
+  try {
     // Get request body
-    const { amount = 500, description = "10 Additional Journal Entries" } = await req.json();
+    const { amount = 500, description = "Premium Upgrade - Unlimited Journal Entries" } = await req.json();
 
     // Try to get authenticated user (optional for one-off payments)
     let userEmail = "guest@calmjournal.app";
@@ -30,8 +31,13 @@ serve(async (req) => {
     try {
       const authHeader = req.headers.get("Authorization");
       if (authHeader) {
+        // Use anon client for auth verification
+        const anonClient = createClient(
+          Deno.env.get("SUPABASE_URL") ?? "",
+          Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+        );
         const token = authHeader.replace("Bearer ", "");
-        const { data } = await supabaseClient.auth.getUser(token);
+        const { data } = await anonClient.auth.getUser(token);
         if (data.user?.email) {
           userEmail = data.user.email;
           userId = data.user.id;
@@ -64,7 +70,7 @@ serve(async (req) => {
             currency: "usd",
             product_data: { 
               name: description,
-              description: "Unlock 10 additional journal entries for your wellness journey"
+              description: "Unlock unlimited journal entries for your wellness journey"
             },
             unit_amount: amount, // Amount in cents
           },
@@ -77,27 +83,18 @@ serve(async (req) => {
       metadata: {
         user_id: userId || "guest",
         email: userEmail,
-        product_type: "journal_entries",
-        quantity: "10"
+        product_type: "premium_upgrade"
       }
     });
 
-    // Optional: Record payment intent in Supabase for tracking
+    // Record payment intent in Supabase for tracking
     if (userId) {
       try {
-        const supabaseService = createClient(
-          Deno.env.get("SUPABASE_URL") ?? "",
-          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-          { auth: { persistSession: false } }
-        );
-        
-        await supabaseService.from("payment_intents").insert({
+        await supabaseService.from("user_payments").insert({
           user_id: userId,
           stripe_session_id: session.id,
           amount: amount,
           status: "pending",
-          product_type: "journal_entries",
-          quantity: 10,
           created_at: new Date().toISOString()
         });
       } catch (dbError) {

@@ -1,81 +1,117 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { CheckCircle, ArrowLeft, Sparkles } from 'lucide-react';
+import { CheckCircle, Sparkles, ArrowLeft } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
-const PaymentSuccess = () => {
+const PaymentSuccess: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get('session_id');
-  const [isVerified, setIsVerified] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isVerifying, setIsVerifying] = useState(true);
+  const [verificationComplete, setVerificationComplete] = useState(false);
 
   useEffect(() => {
-    // In a real app, you might verify the payment with your backend
-    // For now, we'll just show success if session_id exists
+    const sessionId = searchParams.get('session_id');
     if (sessionId) {
-      setIsVerified(true);
-      
-      // Note: This was for guest mode which has been removed
-      // Payment success is now handled via proper user authentication
+      verifyPayment(sessionId);
+    } else {
+      setIsVerifying(false);
     }
-  }, [sessionId]);
+  }, [searchParams]);
+
+  const verifyPayment = async (sessionId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-payment', {
+        body: { sessionId }
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        setVerificationComplete(true);
+        toast({
+          title: "Payment Successful!",
+          description: "You now have unlimited journal entries!",
+        });
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      toast({
+        title: "Verification Error",
+        description: "Please contact support if issues persist.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleContinue = () => {
+    navigate('/');
+  };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-foreground">Payment Successful!</h1>
-          <p className="text-muted-foreground mt-2">
-            Thank you for supporting your wellness journey
-          </p>
-        </div>
-
-        <Card className="p-6 space-y-4">
-          <div className="text-center space-y-2">
-            <Sparkles className="h-8 w-8 text-primary mx-auto" />
-            <h2 className="font-semibold text-foreground">What you unlocked:</h2>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
-              <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-              <span className="text-sm">10 additional journal entries</span>
+    <div className="min-h-screen bg-gradient-calm flex items-center justify-center p-4">
+      <Card className="max-w-md w-full p-8 text-center space-y-6">
+        {isVerifying ? (
+          <>
+            <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
+            <h2 className="text-xl font-semibold">Verifying Payment...</h2>
+            <p className="text-muted-foreground">Please wait while we confirm your payment.</p>
+          </>
+        ) : verificationComplete ? (
+          <>
+            <div className="space-y-4">
+              <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
+              <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-foreground">Payment Successful!</h1>
+                <div className="flex items-center justify-center gap-2 text-primary">
+                  <Sparkles className="h-5 w-5" />
+                  <span className="font-medium">Premium Activated</span>
+                  <Sparkles className="h-5 w-5" />
+                </div>
+              </div>
             </div>
-            
-            <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-              <CheckCircle className="h-5 w-5 text-blue-500 flex-shrink-0" />
-              <span className="text-sm">Full access to meditation sounds</span>
-            </div>
-            
-            <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
-              <CheckCircle className="h-5 w-5 text-purple-500 flex-shrink-0" />
-              <span className="text-sm">Advanced mood insights</span>
-            </div>
-          </div>
 
-          {sessionId && (
-            <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-              <p className="text-xs text-muted-foreground">
-                Transaction ID: {sessionId.slice(-12)}...
-              </p>
+            <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+              <h3 className="font-medium">What's Unlocked:</h3>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>✨ Unlimited journal entries</li>
+                <li>🎵 Full access to meditation sounds</li>
+                <li>📊 Advanced mood insights</li>
+                <li>☁️ Cloud sync</li>
+              </ul>
             </div>
-          )}
-        </Card>
 
-        <div className="space-y-3">
-          <Button asChild className="w-full shadow-soft hover:shadow-glow">
-            <Link to="/">
+            <Button onClick={handleContinue} className="w-full" size="lg">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Continue Journaling
-            </Link>
-          </Button>
-          
-          <p className="text-center text-xs text-muted-foreground">
-            Your purchase has been processed securely by Stripe
-          </p>
-        </div>
-      </div>
+              Continue to Your Journal
+            </Button>
+          </>
+        ) : (
+          <>
+            <div className="space-y-4">
+              <div className="h-16 w-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
+                <span className="text-2xl">⚠️</span>
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-foreground">Payment Verification Failed</h1>
+                <p className="text-muted-foreground">
+                  We couldn't verify your payment. Please contact support if you believe this is an error.
+                </p>
+              </div>
+            </div>
+
+            <Button onClick={handleContinue} variant="outline" className="w-full">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Return to Journal
+            </Button>
+          </>
+        )}
+      </Card>
     </div>
   );
 };

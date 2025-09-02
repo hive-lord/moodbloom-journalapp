@@ -49,14 +49,35 @@ const IndexContent = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [showMeditation, setShowMeditation] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [entryLimit] = useState(20); // Entry limit before upgrade required
+  const [hasPremium, setHasPremium] = useState(false);
+  const entryLimit = hasPremium ? Infinity : 20; // Unlimited for premium, 20 for free
 
   // Load user data when authenticated
   useEffect(() => {
     if (user) {
       loadUserData();
+      checkPremiumStatus();
     }
   }, [user]);
+
+  const checkPremiumStatus = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_payments')
+        .select('has_premium')
+        .eq('user_id', user.id)
+        .eq('has_premium', true)
+        .maybeSingle();
+      
+      if (!error && data) {
+        setHasPremium(true);
+      }
+    } catch (error) {
+      console.error('Error checking premium status:', error);
+    }
+  };
 
   const loadUserData = async () => {
     if (!user) return;
@@ -102,8 +123,17 @@ const IndexContent = () => {
   const saveEntry = async () => {
     if (!user) {
       toast({
-        title: "Authentication required",
-        description: "Please sign in to save your entries",
+        title: "Authentication Required",
+        description: "Please sign in to save your mood entry.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!hasPremium && moodEntries.length >= entryLimit) {
+      toast({
+        title: "Entry Limit Reached",
+        description: "Upgrade to premium for unlimited journal entries!",
         variant: "destructive"
       });
       return;
@@ -265,9 +295,13 @@ const IndexContent = () => {
                       <div className="flex items-center gap-2 text-white">
                         <BookOpen className="h-4 w-4" />
                         <span className="text-sm">
-                          {moodEntries.length} / {entryLimit} entries
+                          {hasPremium ? (
+                            <>Unlimited entries • Premium ✨</>
+                          ) : (
+                            <>{moodEntries.length} / {entryLimit} entries</>
+                          )}
                         </span>
-                        {moodEntries.length >= entryLimit * 0.7 && (
+                        {!hasPremium && moodEntries.length >= entryLimit * 0.7 && (
                           <Crown className="h-3 w-3 ml-1 opacity-80" />
                         )}
                       </div>

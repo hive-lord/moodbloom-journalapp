@@ -67,9 +67,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ trigger }) => {
           <Card className="p-6 bg-gradient-calm text-white text-center">
             <div className="space-y-2">
               <Sparkles className="h-8 w-8 mx-auto opacity-90" />
-              <h3 className="text-lg font-medium">Unlock More Entries</h3>
+              <h3 className="text-lg font-medium">Unlock Unlimited Entries</h3>
               <p className="text-sm opacity-90">
-                Get 10 additional journal entries for your wellness journey
+                Get unlimited journal entries for your wellness journey
               </p>
             </div>
           </Card>
@@ -78,7 +78,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ trigger }) => {
             <div className="text-center space-y-2">
               <h4 className="font-medium text-foreground">What you get:</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>✨ 10 additional journal entries</li>
+                <li>✨ Unlimited journal entries</li>
                 <li>🎵 Full access to meditation sounds</li>
                 <li>📊 Advanced mood insights</li>
                 <li>☁️ Cloud sync (with account)</li>
@@ -87,7 +87,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ trigger }) => {
 
             <div className="border rounded-lg p-4 bg-muted/30">
               <div className="flex justify-between items-center">
-                <span className="font-medium">10 More Entries</span>
+                <span className="font-medium">Premium Access</span>
                 <span className="text-2xl font-bold text-primary">$5</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
