@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { CreditCard, Plus, Sparkles } from 'lucide-react';
+import { CreditCard, Crown, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -43,12 +43,12 @@ export const PaymentModal: React.FC = () => {
     <Dialog>
       <DialogTrigger asChild>
         <Button 
-          variant="outline"
+          variant="ghost"
           size="sm"
-          className="animate-gentle-pulse"
+          className="text-white hover:bg-white/20 flex items-center gap-2"
         >
-          <Plus className="h-4 w-4 mr-2" />
-          Get More Entries
+          <Crown className="h-4 w-4" />
+          Upgrade
         </Button>
       </DialogTrigger>
       

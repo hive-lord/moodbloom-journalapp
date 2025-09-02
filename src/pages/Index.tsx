@@ -12,7 +12,7 @@ import { AuthProvider, useAuth } from '@/components/AuthProvider';
 import { PaymentModal } from '@/components/PaymentModal';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, LogOut, User, BookOpen, Timer, Sparkles } from 'lucide-react';
+import { Calendar, LogOut, User, BookOpen, Timer, Sparkles, Crown } from 'lucide-react';
 import { format } from 'date-fns';
 import heroImage from '@/assets/hero-calm.jpg';
 
@@ -49,6 +49,7 @@ const IndexContent = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [showMeditation, setShowMeditation] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [entryLimit] = useState(50); // Default limit for authenticated users
 
   // Load user data when authenticated
   useEffect(() => {
@@ -247,13 +248,35 @@ const IndexContent = () => {
         {/* Header */}
         <div className="absolute top-0 left-0 right-0 p-6">
           <div className="flex justify-between items-center">
-            <div className="text-white">
-              <h1 className="text-3xl font-light">MoodBloom</h1>
-              <p className="text-white/80">
-                Welcome back{user.user_metadata?.display_name ? `, ${user.user_metadata.display_name}` : ''}
-              </p>
+            {/* Left side - App name and entry counter */}
+            <div className="flex items-center gap-6">
+              <div className="text-white">
+                <h1 className="text-3xl font-light">MoodBloom</h1>
+                <p className="text-white/80">
+                  Welcome back{user.user_metadata?.display_name ? `, ${user.user_metadata.display_name}` : ''}
+                </p>
+              </div>
+              
+              {/* Entry counter and upgrade */}
+              <div className="flex items-center gap-3">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                  <div className="flex items-center gap-2 text-white">
+                    <BookOpen className="h-4 w-4" />
+                    <span className="text-sm">
+                      {moodEntries.length} / {entryLimit} entries
+                    </span>
+                  </div>
+                </div>
+                
+                {moodEntries.length >= entryLimit * 0.8 && (
+                  <div className="bg-yellow-500/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-yellow-400/30">
+                    <PaymentModal />
+                  </div>
+                )}
+              </div>
             </div>
             
+            {/* Right side - Sign out */}
             <div className="flex items-center gap-3">
               <Button 
                 variant="ghost" 
