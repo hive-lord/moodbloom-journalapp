@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Crown, Sparkles, BookOpen, Music, BarChart3, Cloud, X } from 'lucide-react';
+import { Crown, Sparkles, BookOpen, Music, BarChart3, Cloud } from 'lucide-react';
 
 interface WelcomeUpgradeModalProps {
   isOpen: boolean;
@@ -24,20 +24,10 @@ export const WelcomeUpgradeModal: React.FC<WelcomeUpgradeModalProps> = ({
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-center flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Welcome Back, Premium User!
-              </DialogTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <DialogTitle className="text-center flex items-center gap-2 justify-center">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Welcome Back, Premium User!
+            </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
@@ -81,17 +71,7 @@ export const WelcomeUpgradeModal: React.FC<WelcomeUpgradeModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-center">Welcome Back!</DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="text-center">Welcome Back!</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">

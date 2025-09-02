@@ -108,8 +108,8 @@ const IndexContent = () => {
           // Already journaled today, no streak change
           newStreak = currentStreak?.journal_streak || 1;
         } else {
-          // Streak broken, start new
-          newStreak = 1;
+          // Streak broken, reset to 0
+          newStreak = 0;
         }
       }
 
@@ -195,8 +195,8 @@ const IndexContent = () => {
           // Already meditated today, no streak change
           newStreak = currentStreak?.meditation_streak || 1;
         } else {
-          // Streak broken, start new
-          newStreak = 1;
+          // Streak broken, reset to 0
+          newStreak = 0;
         }
       }
 
