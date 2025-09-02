@@ -133,6 +133,23 @@ const IndexContent = () => {
       return;
     }
 
+    // Check entry limit for guest users
+    if (!user) {
+      const guestData = JSON.parse(localStorage.getItem('calmJournal_guestData') || '{}');
+      const baseLimit = 10;
+      const paidEntries = guestData.paidEntries || 0;
+      const maxAllowed = baseLimit + paidEntries;
+      
+      if (moodEntries.length >= maxAllowed) {
+        toast({
+          title: "Entry limit reached",
+          description: "Purchase more entries to continue journaling",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
     setIsSaving(true);
     const today = format(new Date(), 'yyyy-MM-dd');
 
@@ -385,10 +402,18 @@ const IndexContent = () => {
                       <div className="text-xs text-muted-foreground">
                         {journalEntry.length} characters
                       </div>
-                      <PaymentModal 
-                        currentEntryCount={moodEntries.length} 
-                        maxEntries={user ? 50 : 5} 
-                      />
+                      {!user && (() => {
+                        const guestData = JSON.parse(localStorage.getItem('calmJournal_guestData') || '{}');
+                        const baseLimit = 10;
+                        const paidEntries = guestData.paidEntries || 0;
+                        const maxAllowed = baseLimit + paidEntries;
+                        return (
+                          <PaymentModal 
+                            currentEntryCount={moodEntries.length} 
+                            maxEntries={maxAllowed} 
+                          />
+                        );
+                      })()}
                     </div>
                     
                     <div className="flex gap-2">
